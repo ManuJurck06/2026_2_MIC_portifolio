@@ -9,11 +9,13 @@
 #include "avr/interrupt.h"
 #include "util/delay.h"
 
-ISR(PCINT0_vect){
-	PORTC |= (1<<PORTC0); //seta pino PC0
-	_delay_ms(100);
-	PORTC &= ~(1<<PORTC0);
-}
+#define KEY_RELEASED 0
+#define KEY_PRESSED 1
+
+uint8_t gKeyState_w = 0;
+uint8_t gKeyState_a = 0;
+uint8_t gKeyState_s = 0;
+uint8_t gKeyState_d = 0;
 
 void GPIO_config(){    //&= (bit 0 - limpa bits)   -> |= seta para 1 
 	DDRB &= ~((1<<DDB0)|(1<<DDB1)|(1<<DDB2)|(1<<DDB3)); // Portas PB0, PB1, PB2, PB3 como entradas 
@@ -24,10 +26,39 @@ void GPIO_config(){    //&= (bit 0 - limpa bits)   -> |= seta para 1
 	DDRC |= (1<<DDC0);
 }
 
+void GPIO_incBar(){
+	PORTD = PORTD >> 1;
+	PORTD |= 0b10000000; //Aciona bit mais significativo
+}
+
 void PCINT_config(){
 	PCICR |= (1<<PCIE0); // Habilita grupo de interrupção  PCINT0-PCINT7
-	PCMSK0 |= (1<<PCINT2)|(1<<PCINT0); //Mascara que seta 1 para os PCINT 
+	PCMSK0 |= (1<<PCINT3)|(1<<PCINT2)|(1<<PCINT1)|(1<<PCINT0); //Mascara que seta 1 para os PCINT 
 	//ou PCMSK0 |= (0<<PCINT3)|(1<<PCINT2)|(0<<PCINT1)|(1<<PCINT0);
+}
+
+ISR(PCINT0_vect){
+	uint8_t tCurrentKeyState_w = 0; 
+	if((PINB & (1<<PINB0)) != 0){  //TESTA PINO PB0 ------------->//PIN é para leitura do pino e POR é para escrita
+		//PB0 = 1, tecla w solta
+		tCurrentKeyState_w = KEY_RELEASED;
+	} else{
+		//PB0 = 0, tecla w pressionada
+		tCurrentKeyState_w = KEY_PRESSED;
+	}
+	if(tCurrentKeyState_w == KEY_PRESSED && gKeyState_w == KEY_RELEASED){
+		//tecla W, acabou de ser pressionada
+		gKeyState_w = KEY_PRESSED;
+		GPIO_incBar(); //puxa função da barra de leds
+	}else{
+		if(tCurrentKeyState_w == KEY_RELEASED && gKeyState_w == KEY_PRESSED){
+			//tecla W, acabou de ser solta
+			gKeyState_w = KEY_RELEASED;	
+	}}
+	gKeyState_w = tCurrentKeyState_w;
+	PORTC ^= (1<<PORTC0); //seta pino PC0    ---> shor (ou exclusivo)
+	//_delay_ms(100);
+	//PORTC &= ~(1<<PORTC0);
 }
 
 int main(void){
