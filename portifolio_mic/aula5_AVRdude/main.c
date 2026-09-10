@@ -5,12 +5,17 @@
  *  Author: Manuelly Jurck
  */ 
 
-#include <xc.h>
+# define F_CPU 16000000
+# include <xc.h>
+# include "util/delay.h"
 
-int main(void)
-{
-    while(1)
-    {
-        //TODO:: Please write your application code 
-    }
+void GPIO_config () {
+	DDRB |=(1<<DDB5) ; // Pino PB5 (13) como saida
 }
+int main (void) {
+	GPIO_config () ;
+	while (1) {
+		PORTB ^=(1<<PORTB5); // Alterna o estado do LED
+		_delay_ms(100);
+	}
+}
