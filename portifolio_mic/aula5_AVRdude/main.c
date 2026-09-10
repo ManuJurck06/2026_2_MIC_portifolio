@@ -1,21 +1,25 @@
-/*
- * main.c
- *
- * Created: 9/10/2026 9:10:30 AM
- *  Author: Manuelly Jurck
- */ 
-
 # define F_CPU 16000000
-# include <xc.h>
-# include "util/delay.h"
+ # include <xc.h>
+ # include "util/delay.h"
 
-void GPIO_config () {
-	DDRB |=(1<<DDB5) ; // Pino PB5 (13) como saida
+ void GPIO_incBar () {
+	 PORTD = PORTD >> 1;
+	 PORTD |= 0b10000000;
 }
-int main (void) {
-	GPIO_config () ;
-	while (1) {
-		PORTB ^=(1<<PORTB5); // Alterna o estado do LED
-		_delay_ms(100);
-	}
-}
+
+ void GPIO_decBar () {
+	 PORTD = PORTD << 1;
+ }
+
+ void GPIO_config () {
+	 DDRD = 0xFF; // pinos usados pelos LEDs como saida
+	 PORTD = 0x00; // parte com a barra apagada
+ }
+
+ int main ( void ) {
+	 GPIO_config ();
+	 while (1) {
+		 for ( uint8_t i = 0; i < 8; i ++) { GPIO_incBar () ; _delay_ms (200); }
+		 for ( uint8_t i = 0; i < 8; i ++) { GPIO_decBar () ; _delay_ms (200); }
+	 }
+ }
