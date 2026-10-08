@@ -8,12 +8,13 @@
 #include <xc.h>
 #include <util/delay.h>
 # include "spi.h"
+# include "sm28vlt32.h"
 
 int main(void){
 	SPI_master_config();
     while(1)
     {
-	SPI_transceive(0x42);
+	uint8_t tMemoryData = SM28VLT_readWord(1000);
 	   _delay_ms(1);
     }
 }
