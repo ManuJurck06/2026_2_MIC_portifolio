@@ -8,11 +8,16 @@
 #include <xc.h>
 #include "avr/interrupt.h"
 
+uint16_t gMilliseconds = 0;
+uint8_t gClockSeconds = 0;
+uint8_t gClockMinutes = 0;
+uint8_t gClockHours = 0;
+
 //obter ujma interrupção com periodo de 10ms
 
 ISR(TIMER0_COMPA_vect){ //Interrupção de comparação A
-	PORTB ^= (1<<PORTB0);
-	
+	gMilliseconds += 10;
+
 }
 
 void TMR0_config(){
@@ -29,8 +34,27 @@ int main(void)
 	DDRB |= (1<<DDB0);
 	TMR0_config();
 	sei();
-    while(1)
-    {
-        //TODO:: Please write your application code 
+    while(1){
+		if(gMilliseconds < 100){
+			PORTB |= (1<<PORTB0); //Seta PB0 por 100ms
+		}else{
+			PORTB &= ~(1<<PORTB0); //Zera PB0 por 900ms
+		}
+		//lógica do RTC (Real Time Clock)
+        	if(gMilliseconds >= 1000){
+	        	gMilliseconds = 0;
+	        	gClockSeconds++;
+	        	if(gClockSeconds >= 60){
+		        	gClockSeconds = 0;
+		        	gClockMinutes++;
+		        	if(gClockMinutes >=60){
+			        	gClockMinutes = 0;
+			        	gClockHours++;
+			        	if(gClockHours >= 24){
+				        	gClockHours = 0;
+			        	}
+		        	}
+	        	}
+        	} 
     }
 }
