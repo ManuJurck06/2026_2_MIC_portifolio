@@ -25,6 +25,8 @@ Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "aula10_twi_slave", "aula10_
 EndProject
 Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "aula11_timer", "aula11_timer\aula11_timer.cproj", "{30C860B9-A5C2-4855-A54B-25212DFA8BCB}"
 EndProject
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "aula12_pwm", "aula12_pwm\aula12_pwm.cproj", "{151506AE-2124-4DCB-91F0-0AD2AECA1595}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|AVR = Debug|AVR
@@ -75,6 +77,10 @@ Global
 		{30C860B9-A5C2-4855-A54B-25212DFA8BCB}.Debug|AVR.Build.0 = Debug|AVR
 		{30C860B9-A5C2-4855-A54B-25212DFA8BCB}.Release|AVR.ActiveCfg = Release|AVR
 		{30C860B9-A5C2-4855-A54B-25212DFA8BCB}.Release|AVR.Build.0 = Release|AVR
+		{151506AE-2124-4DCB-91F0-0AD2AECA1595}.Debug|AVR.ActiveCfg = Debug|AVR
+		{151506AE-2124-4DCB-91F0-0AD2AECA1595}.Debug|AVR.Build.0 = Debug|AVR
+		{151506AE-2124-4DCB-91F0-0AD2AECA1595}.Release|AVR.ActiveCfg = Release|AVR
+		{151506AE-2124-4DCB-91F0-0AD2AECA1595}.Release|AVR.Build.0 = Release|AVR
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
