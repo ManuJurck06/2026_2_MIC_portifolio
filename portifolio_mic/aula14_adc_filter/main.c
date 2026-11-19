@@ -8,16 +8,28 @@
 #include <xc.h>
 #include "avr/interrupt.h"
 
+
+uint16_t x[4]; //Medidas do ADC
+
 ISR (TIMER1_COMPB_vect){
 	PORTB ^= (1<<PORTB1); //debug para visuzalizar o tempo fo TMR1
 }
 ISR(ADC_vect){ //interrupção referente a conversão concluida
+	PORTB |= (1<<PORTB1); //Debug: tempo de processamento
        uint8_t tADCData = ADC;                         // Acesso a ADCH e ADCL como um unico registrador de 16 bits, faixa inteiros de 0 a 1023 (ADLAR = 0)
-       if(tADCData < 670){
+	   //Filtro Média Movel de ordem 4
+	   x[3] = x[2]; //Linha de atraso do sinal x (fila FIFO)
+	   x[2] = x[1];
+	   x[1] = x[0];
+	   x[0] = tADCData;
+	   uint16_t y = (x[0] + x[1] + x[2] + x[3])/4;  //Filtro Média Movel de ordem 4
+	   
+       if(y < 670){
 	       PORTB ^= (1<<PORTB0);                        //Acender LED abaixo de 720mV
 	       }else{
 	       PORTB &= ~(1<<PORTB0);                      //Apagar LED caso contrario
        }
+	PORTB &= ~(1<<PORTB1); //Debug: tempo de processamento
 }
 void ADC_config(){
 	ADMUX = (1<<MUX0)|(1<<MUX1)|(1<<MUX2)|(0<<MUX3)    //Canal de conversão: pino ADC0
