@@ -8,8 +8,13 @@
 #include <xc.h>
 #include "avr/interrupt.h"
 
+//Termos do filtro(função transferencia) (butterworth de ordem 2, corte em 0.114*fs = 114Hz)
+const int16_t b[3] = {1372, 2744, 1372};
+const int16_t a[2] = {-16899,6002};  //Medidas do ADC
 
-uint16_t x[4]; //Medidas do ADC
+int16_t x[3]; //medidas do adc
+int16_t y[3]; //saída filtro
+
 
 ISR (TIMER1_COMPB_vect){
 	PORTB ^= (1<<PORTB1); //debug para visuzalizar o tempo fo TMR1
@@ -17,11 +22,14 @@ ISR (TIMER1_COMPB_vect){
 ISR(ADC_vect){ //interrupção referente a conversão concluida
 	PORTB |= (1<<PORTB1); //Debug: tempo de processamento
        uint8_t tADCData = ADC;                         // Acesso a ADCH e ADCL como um unico registrador de 16 bits, faixa inteiros de 0 a 1023 (ADLAR = 0)
-	   //Filtro Média Movel de ordem 4
-	   x[3] = x[2]; //Linha de atraso do sinal x (fila FIFO)
-	   x[2] = x[1];
+	   //Linha de atraso do sinal x e y (fila FIFO)
+	   x[2] = x[1]; 
 	   x[1] = x[0];
 	   x[0] = tADCData;
+	   y[2] = y[1];
+	   y[1] = y[0];
+	   y[0] = b[0]*x[0] + b[1]*x[1] + b[2]*x[2] - a[0]*y[1] - a[1]*y[2];
+			  
 	   uint16_t y = (x[0] + x[1] + x[2] + x[3])/4;  //Filtro Média Movel de ordem 4
 	   
        if(y < 670){
